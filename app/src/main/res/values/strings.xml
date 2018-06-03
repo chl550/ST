@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ScheduleTracker</string>
+    <string name="title_activity_caregiver">Caregiver</string>
+</resources>
