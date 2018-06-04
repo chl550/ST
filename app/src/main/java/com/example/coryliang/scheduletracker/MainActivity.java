@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 if (user.equals("caregiver") && pass.equals("pass")) {
                     Toast.makeText(getApplicationContext(), "Successful Login",
                             Toast.LENGTH_LONG).show();
+                    caregiverLaunch();
                     //move to caregiver screen here
                 }
                 else if (user.equals("patient") && pass.equals("patientpass")) {
@@ -50,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
         });
         //TODO: Find way to get signals from Arduino, then move into method to get location.
 
+    }
+    private void caregiverLaunch() {
+        Intent intent = new Intent(this, CaregiverActivity.class);
+        startActivity(intent);
     }
 
     public String findLocation(double longitude, double latitude) throws IOException {
