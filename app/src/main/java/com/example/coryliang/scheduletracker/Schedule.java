@@ -5,11 +5,13 @@ import android.location.Location;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
+import java.util.TreeMap;
 
 
 /**
@@ -17,17 +19,19 @@ import java.util.Set;
  */
 
 public class Schedule {
-    private static HashMap<Date, String[]> schedule;
+    private static Map<Date, SchedulePair> schedule;
+    private SchedulePair pair;
     public Schedule() {
-        schedule = new HashMap<Date,String[]>();
+        schedule = new TreeMap<Date,SchedulePair>();
     }
     public void addTask(Date time, String location, String task) {
-        String[] array = new String[2];
-        array[0] = location;
-        array[1] = task;
-        schedule.put(time, array);
+        pair = new SchedulePair(location,task, false);
+        schedule.put(time, pair);
     }
+    //might change later, will only be able to delete a task assuming person has unique times
     public void deleteTask(Date time, String location, String task) {
+        schedule.remove(time);
+        /*
         Set<Date> keys = schedule.keySet();
         Iterator<Date> it = keys.iterator();
         while (it.hasNext()) {
@@ -39,10 +43,17 @@ public class Schedule {
                 }
             }
         }
+        */
     }
     public void modifyTask(Date time, String location, String task) {
-        schedule.get(time)[0] = location;
-        schedule.get(time)[1] = task;
+        schedule.get(time).setLocation(location);
+        schedule.get(time).setTask(task);
+    }
+    public void taskDone(Date time) {
+        schedule.get(time).setStatus(true);
+    }
+    public SchedulePair findTask(Date time) {
+        return schedule.get(time);
     }
 
 }

@@ -1,10 +1,14 @@
 package com.example.coryliang.scheduletracker;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.icu.util.Output;
 import android.location.Address;
-import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,7 +16,11 @@ import android.widget.Toast;
 import android.location.Geocoder;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,6 +58,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //TODO: Find way to get signals from Arduino, then move into method to get location.
+        BluetoothAdapter blue = BluetoothAdapter.getDefaultAdapter();
+        if (blue == null) {
+            Log.d("Blue","No bluetooth");
+
+        }
+        else if (!blue.isEnabled()) {
+            Intent enable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enable,0);
+        }
+        final Bluetooth thread = new Bluetooth(blue);
+        Log.d("Blue", "running thread");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                thread.start();
+            }
+        });
+        Log.d("Blue", "ran thread");
+
 
     }
     private void caregiverLaunch() {
@@ -64,4 +91,6 @@ public class MainActivity extends AppCompatActivity {
         String retAddress = address.getAddressLine(0);
         return retAddress;
     }
+
+
 }
