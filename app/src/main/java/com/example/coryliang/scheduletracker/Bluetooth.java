@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.lang.Float.valueOf;
 import static java.security.AccessController.getContext;
 
 /**
@@ -25,9 +26,11 @@ public class Bluetooth extends Thread implements Runnable{
     BluetoothSocket socket = null;
     InputStream input = null;
     OutputStream output = null;
+    CaregiverActivity activity = null;
 
-    public Bluetooth(BluetoothAdapter blue) {
+    public Bluetooth(BluetoothAdapter blue, CaregiverActivity activity) {
         this.blue = blue;
+        this.activity = activity;
     }
 
     public boolean connect(BluetoothAdapter blue) {
@@ -64,6 +67,8 @@ public class Bluetooth extends Thread implements Runnable{
     @Override
     public void run() {
         String combine = "";
+        float latitude = 0;
+        float longitude = 0;
         boolean check = true;
         if (connect(blue) == true) {
             while(check) {
@@ -78,10 +83,17 @@ public class Bluetooth extends Thread implements Runnable{
                         input.read(rawBytes);
                         final String string = new String(rawBytes, "UTF-8");
                         combine += string;
-                        if (combine.length() >= 9) {
+                        //combine the strings
+                        if (combine.contains("#")) {
                             combine = combine.substring(0, combine.length()-1);
                             Log.d("READ", "Combine has " + combine + " " +combine.length());
+                            String[] array = combine.split(" ");
                             combine="";
+                            latitude = Float.valueOf(array[0]);
+                            longitude = Float.valueOf(array[1]);
+                            activity.updateLocation(latitude,longitude);
+                            activity.currLocation = activity.findLocation(latitude, longitude);
+
                         }
 
                     }

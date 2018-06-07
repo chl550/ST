@@ -3,6 +3,8 @@ package com.example.coryliang.scheduletracker;
 import android.location.Location;
 
 import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,8 +21,9 @@ import java.util.TreeMap;
  */
 
 public class Schedule {
-    private static Map<Date, SchedulePair> schedule;
+    public static Map<Date, SchedulePair> schedule;
     private SchedulePair pair;
+
     public Schedule() {
         schedule = new TreeMap<Date,SchedulePair>();
     }
@@ -50,10 +53,56 @@ public class Schedule {
         schedule.get(time).setTask(task);
     }
     public void taskDone(Date time) {
-        schedule.get(time).setStatus(true);
+        if (schedule.get(time).getStatus() == false) {
+            schedule.get(time).setStatus(true);
+        }
+        else {
+            schedule.get(time).setStatus(false);
+        }
     }
     public SchedulePair findTask(Date time) {
         return schedule.get(time);
+    }
+    public int getCount() {
+        return schedule.size();
+    }
+    public Date getNKey(int i) {
+        int count = 0;
+        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+            if (count == i) {
+                return entry.getKey();
+            }
+            count++;
+
+        }
+        return null;
+    }
+    public String dateToString(Date time) {
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String ret = df.format(time);
+        return ret;
+    }
+
+    public String getNLocation(int i) {
+        int count = 0;
+        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+            if (count == i) {
+                return entry.getValue().getLocation();
+            }
+            count++;
+        }
+        return null;
+    }
+
+    public String getNTask(int i) {
+        int count = 0;
+        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+            if (count == i) {
+                return entry.getValue().getTask();
+            }
+            count++;
+        }
+        return null;
     }
 
 }

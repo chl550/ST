@@ -12,7 +12,7 @@ public class SchedulePair {
     public SchedulePair(String one, String two, boolean three) {
         location = one;
         task = two;
-        done = done;
+        done = three;
     }
     public String getLocation() {
         return this.location;

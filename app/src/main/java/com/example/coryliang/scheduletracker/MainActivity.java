@@ -58,24 +58,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //TODO: Find way to get signals from Arduino, then move into method to get location.
-        BluetoothAdapter blue = BluetoothAdapter.getDefaultAdapter();
-        if (blue == null) {
-            Log.d("Blue","No bluetooth");
 
-        }
-        else if (!blue.isEnabled()) {
-            Intent enable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enable,0);
-        }
-        final Bluetooth thread = new Bluetooth(blue);
-        Log.d("Blue", "running thread");
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                thread.start();
-            }
-        });
-        Log.d("Blue", "ran thread");
 
 
     }
@@ -84,13 +67,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public String findLocation(double longitude, double latitude) throws IOException {
-        Geocoder code = new Geocoder(getApplicationContext());
-        ArrayList<Address> currLocation = (ArrayList<Address>) code.getFromLocation(latitude, longitude, 1);
-        Address address = currLocation.get(0);
-        String retAddress = address.getAddressLine(0);
-        return retAddress;
-    }
+
 
 
 }
