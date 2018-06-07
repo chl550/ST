@@ -63,26 +63,32 @@ public class Bluetooth extends Thread implements Runnable{
     }
     @Override
     public void run() {
+        String combine = "";
+        boolean check = true;
         if (connect(blue) == true) {
-            int byteCount = 0;
-            if (input == null) {
-                Log.d("Blue", "Input is null!");
-            }
-            try {
-                byteCount = input.available();
-                if(byteCount > 0)
-                {
-                    byte[] rawBytes = new byte[byteCount];
-                    input.read(rawBytes);
-                    final String string = new String(rawBytes,"UTF-8");
-                    Log.d("READ",string);
+            while(check) {
+                int byteCount = 0;
+                if (Thread.interrupted()) {
+                    break;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    byteCount = input.available();
+                    if (byteCount > 0) {
+                        byte[] rawBytes = new byte[byteCount];
+                        input.read(rawBytes);
+                        final String string = new String(rawBytes, "UTF-8");
+                        combine += string;
+                        if (combine.length() >= 9) {
+                            combine = combine.substring(0, combine.length()-1);
+                            Log.d("READ", "Combine has " + combine + " " +combine.length());
+                            combine="";
+                        }
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
         }
-
     }
-
 }
