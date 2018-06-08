@@ -45,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
                     caregiverLaunch();
                     //move to caregiver screen here
                 }
-                else if (user.equals("patient") && pass.equals("patientpass")) {
+                else if (user.equals("patient") && pass.equals("pass")) {
                     Toast.makeText(getApplicationContext(), "Successful patient login",
                             Toast.LENGTH_LONG).show();
                     //move to patient screen here
+                    patientLaunch();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "Username and Password doesn't match",
@@ -65,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
     private void caregiverLaunch() {
         Intent intent = new Intent(this, CaregiverActivity.class);
         startActivity(intent);
+    }
+
+    private void patientLaunch() {
+        Intent intent1 = new Intent(this, PatientActivity.class);
+        this.startActivity(intent1);
     }
 
 

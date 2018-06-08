@@ -2,6 +2,7 @@ package com.example.coryliang.scheduletracker;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
@@ -14,20 +15,28 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Map;
+import java.util.Stack;
 
 public class CaregiverActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    @Expose
     private Schedule schedule = new Schedule();
     Calendar calendar = new GregorianCalendar();
     public String currLocation = "";
+    private Stack<Marker> markers = new Stack<Marker>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +46,33 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //for demo and testing purposes only, remove once demo is done. Tests adding to schedule
+        //need to add a schedule loader, another activity or class
         calendar.set(2018, 9, 24, 5, 0 , 0);
         schedule.addTask(new Date(calendar.getTimeInMillis()), "Washington", "Water the lawn");
         calendar.set(2018, 9, 24, 6, 0 , 0);
         schedule.addTask(new Date(calendar.getTimeInMillis()), "California", "Fix IT");
         calendar.set(2018, 9, 24, 7, 0 , 0);
         schedule.addTask(new Date(calendar.getTimeInMillis()), "Missouri", "Cook food");
+        //Intent might not work for our purposes StartActivity
+        /*
+        Intent toPatient = new Intent(this, PatientActivity.class);
+        toPatient.setAction(Intent.ACTION_SEND);
+        toPatient.putExtra("schedule", (Schedule) schedule);
+        this.startActivity(toPatient);
+        */
+        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        SharedPreferences.Editor prefEdit = pref.edit();
+        //bugged information isnt passing to patient activity
+        GsonBuilder g = new GsonBuilder();
+        Gson gson = g.create();
+        String json = gson.toJson(schedule);
+        prefEdit.putString("schedule", json);
+        prefEdit.commit();
         ListView list = (ListView) findViewById(R.id.taskList);
         ListAdapter listAdapter = new ListAdapter(getApplicationContext(), schedule);
         list.setAdapter(listAdapter);
+        //start bluetooth connection
         BluetoothAdapter blue = BluetoothAdapter.getDefaultAdapter();
         if (blue == null) {
             Log.d("Blue","No bluetooth");
@@ -66,38 +93,54 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         Log.d("Blue", "ran thread");
     }
 
+    public void checkList() {
+        String currTask;
+        String currAddress;
+        Date time;
+        Date currTime = calendar.getTime();
+        //keep checking until schedule is empty
+        while(!schedule.schedule.isEmpty()) {
+            Log.d("Alert", "ALERT TRIGGERED");
+            currTask = schedule.getNTask(0);
+            currAddress = schedule.getNLocation(0);
+            time = schedule.getNKey(0);
+            if (!currLocation.equals(currAddress) && time == currTime || (time != currTime && schedule.schedule.get(time).getStatus() == false)) {
+                //Move into Alert, send signal to arduino to buzz,
+                Intent intent = new Intent(this, AlertActivity.class);
+                startActivity(intent);
+            }
+        }
+    }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(32.715738, -117.16108400000002);
+        LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Default Marker"));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
-    //update map.
+    //update map, move map marker.
     public void updateLocation(float latitude, float longitude) {
+  /*     Marker top = null;
+        if (!markers.empty()) {
+            top = markers.pop();
+        }
+         top.remove();*/
         LatLng location = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(location).title("Moving Marker"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
-    public String findLocation(double longitude, double latitude) throws IOException {
+    public void findLocation(double latitude, double longitude) throws IOException {
         Geocoder code = new Geocoder(getApplicationContext());
-        ArrayList<Address> currLocation = (ArrayList<Address>) code.getFromLocation(latitude, longitude, 1);
-        Address address = currLocation.get(0);
-        String retAddress = address.getAddressLine(0);
-        return retAddress;
+        ArrayList<Address> currLocation2 = (ArrayList<Address>) code.getFromLocation(latitude, longitude, 1);
+        Address address = currLocation2.get(0);
+        currLocation = address.getAddressLine(0);
+        Log.d("Location", currLocation);
+
     }
 
 }

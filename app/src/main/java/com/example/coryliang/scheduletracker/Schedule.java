@@ -1,6 +1,11 @@
 package com.example.coryliang.scheduletracker;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
+import com.google.gson.annotations.Expose;
 
 import java.lang.reflect.Array;
 import java.text.DateFormat;
@@ -20,9 +25,11 @@ import java.util.TreeMap;
  * Created by Cory Liang on 6/2/2018.
  */
 
-public class Schedule {
+public class Schedule implements Parcelable {
+    @Expose
     public static Map<Date, SchedulePair> schedule;
-    private SchedulePair pair;
+    @Expose
+    public SchedulePair pair;
 
     public Schedule() {
         schedule = new TreeMap<Date,SchedulePair>();
@@ -34,19 +41,7 @@ public class Schedule {
     //might change later, will only be able to delete a task assuming person has unique times
     public void deleteTask(Date time, String location, String task) {
         schedule.remove(time);
-        /*
-        Set<Date> keys = schedule.keySet();
-        Iterator<Date> it = keys.iterator();
-        while (it.hasNext()) {
-            Date time2 = it.next();
-            if (time.equals(time2)) {
-                if (schedule.get(time2)[0] == location && schedule.get(time2)[1] == task) {
-                    schedule.remove(time2);
-                    break;
-                }
-            }
-        }
-        */
+
     }
     public void modifyTask(Date time, String location, String task) {
         schedule.get(time).setLocation(location);
@@ -104,5 +99,42 @@ public class Schedule {
         }
         return null;
     }
+    //only removed if all tasks are finished
+    public void removeAll() {
+        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+            if (entry.getValue().getStatus() == false) {
+                Log.d("done", "All tasks not finished yet");
+                return;
+            }
+        }
+        schedule.clear();
+    }
 
+
+    protected Schedule(Parcel in) {
+        pair = (SchedulePair) in.readValue(SchedulePair.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(pair);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Schedule> CREATOR = new Parcelable.Creator<Schedule>() {
+        @Override
+        public Schedule createFromParcel(Parcel in) {
+            return new Schedule(in);
+        }
+
+        @Override
+        public Schedule[] newArray(int size) {
+            return new Schedule[size];
+        }
+    };
 }

@@ -1,11 +1,13 @@
 package com.example.coryliang.scheduletracker;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -56,6 +58,9 @@ public class ListAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 schedule.taskDone(currDate);
+                view.setSelected(true);
+                view.setBackgroundColor(Color.GREEN);
+
             }
         });
         return view;

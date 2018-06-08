@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ public class Bluetooth extends Thread implements Runnable{
     InputStream input = null;
     OutputStream output = null;
     CaregiverActivity activity = null;
+    Handler care = new Handler(Looper.myLooper());
 
     public Bluetooth(BluetoothAdapter blue, CaregiverActivity activity) {
         this.blue = blue;
@@ -82,17 +85,31 @@ public class Bluetooth extends Thread implements Runnable{
                         byte[] rawBytes = new byte[byteCount];
                         input.read(rawBytes);
                         final String string = new String(rawBytes, "UTF-8");
+                        Log.d("READ", string);
+
                         combine += string;
                         //combine the strings
                         if (combine.contains("#")) {
-                            combine = combine.substring(0, combine.length()-1);
+                            combine = combine.replaceAll("#","");
                             Log.d("READ", "Combine has " + combine + " " +combine.length());
                             String[] array = combine.split(" ");
                             combine="";
                             latitude = Float.valueOf(array[0]);
                             longitude = Float.valueOf(array[1]);
-                            activity.updateLocation(latitude,longitude);
-                            activity.currLocation = activity.findLocation(latitude, longitude);
+                            final float finalLatitude = latitude;
+                            final float finalLongitude = longitude;
+                            Runnable run = new Runnable() {
+                                @Override
+                                public void run() {
+                                    activity.updateLocation(finalLatitude, finalLongitude);
+                                    try {
+                                        activity.findLocation(finalLatitude, finalLongitude);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+                            care.post(run);
 
                         }
 
