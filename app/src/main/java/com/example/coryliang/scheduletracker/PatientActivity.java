@@ -6,15 +6,21 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.Date;
+import java.util.Map;
 
 public class PatientActivity extends AppCompatActivity {
     Schedule schedule = null;
-
+    Map<Long, SchedulePair> hold = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +49,10 @@ public class PatientActivity extends AppCompatActivity {
         GsonBuilder g = new GsonBuilder();
         Gson gson = g.create();
         String json = pref.getString("schedule","");
-        schedule = gson.fromJson(json, Schedule.class);
+        Log.d("json", json);
+        Type type = new TypeToken<Map<Long,SchedulePair>>() {}.getType();
+        hold = (Map<Long, SchedulePair>) gson.fromJson(json, type);
+        schedule = new Schedule(hold);
 
 
         ListView patList = (ListView) findViewById(R.id.taskList2);

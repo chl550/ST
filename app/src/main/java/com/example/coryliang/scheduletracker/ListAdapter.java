@@ -20,6 +20,7 @@ public class ListAdapter extends BaseAdapter {
     Context context;
     Schedule schedule;
     LayoutInflater layout;
+    boolean check;
 
     public ListAdapter(Context context, Schedule schedule) {
         this.context = context;
@@ -45,11 +46,14 @@ public class ListAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         view = layout.inflate(R.layout.activity_list,null);
+        final View tempView = view;
+        view.setBackgroundColor(Color.RED);
+        check = false;
         TextView date = (TextView) view.findViewById(R.id.timeList);
         TextView location = (TextView) view.findViewById(R.id.Location);
         TextView task = (TextView) view.findViewById(R.id.Task);
         Button done = (Button) view.findViewById(R.id.done);
-        final Date currDate = schedule.getNKey(i);
+        final Date currDate = new Date(schedule.getNKey(i));
         String dateText = schedule.dateToString(currDate);
         date.setText(dateText);
         location.setText(schedule.getNLocation(i));
@@ -57,12 +61,16 @@ public class ListAdapter extends BaseAdapter {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                schedule.taskDone(currDate);
+                schedule.taskDone(schedule.getNKey(i));
                 view.setSelected(true);
-                view.setBackgroundColor(Color.GREEN);
+                if (check == false) {
+                    check = true;
+                }
+                tempView.setBackgroundColor(Color.GREEN);
 
             }
         });
+
         return view;
     }
 }

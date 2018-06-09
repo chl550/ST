@@ -49,11 +49,11 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         //for demo and testing purposes only, remove once demo is done. Tests adding to schedule
         //need to add a schedule loader, another activity or class
         calendar.set(2018, 9, 24, 5, 0 , 0);
-        schedule.addTask(new Date(calendar.getTimeInMillis()), "Washington", "Water the lawn");
+        schedule.addTask(calendar.getTimeInMillis(), "Washington", "Water the lawn");
         calendar.set(2018, 9, 24, 6, 0 , 0);
-        schedule.addTask(new Date(calendar.getTimeInMillis()), "California", "Fix IT");
+        schedule.addTask(calendar.getTimeInMillis(), "California", "Fix IT");
         calendar.set(2018, 9, 24, 7, 0 , 0);
-        schedule.addTask(new Date(calendar.getTimeInMillis()), "Missouri", "Cook food");
+        schedule.addTask(calendar.getTimeInMillis(), "Missouri", "Cook food");
         //Intent might not work for our purposes StartActivity
         /*
         Intent toPatient = new Intent(this, PatientActivity.class);
@@ -66,7 +66,8 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         //bugged information isnt passing to patient activity
         GsonBuilder g = new GsonBuilder();
         Gson gson = g.create();
-        String json = gson.toJson(schedule);
+        String json = gson.toJson(schedule.getMap());
+        Log.d("json", json);
         prefEdit.putString("schedule", json);
         prefEdit.commit();
         ListView list = (ListView) findViewById(R.id.taskList);
@@ -96,8 +97,8 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
     public void checkList() {
         String currTask;
         String currAddress;
-        Date time;
-        Date currTime = calendar.getTime();
+        Long time;
+        Long currTime = calendar.getTimeInMillis();
         //keep checking until schedule is empty
         while(!schedule.schedule.isEmpty()) {
             Log.d("Alert", "ALERT TRIGGERED");

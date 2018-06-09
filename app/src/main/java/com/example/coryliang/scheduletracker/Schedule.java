@@ -27,27 +27,30 @@ import java.util.TreeMap;
 
 public class Schedule implements Parcelable {
     @Expose
-    public static Map<Date, SchedulePair> schedule;
+    public static Map<Long, SchedulePair> schedule;
     @Expose
     public SchedulePair pair;
 
     public Schedule() {
-        schedule = new TreeMap<Date,SchedulePair>();
+        schedule = new TreeMap<Long,SchedulePair>();
     }
-    public void addTask(Date time, String location, String task) {
+    public Schedule(Map<Long, SchedulePair> schedule) {
+        this.schedule = schedule;
+    }
+    public void addTask(Long time, String location, String task) {
         pair = new SchedulePair(location,task, false);
         schedule.put(time, pair);
     }
     //might change later, will only be able to delete a task assuming person has unique times
-    public void deleteTask(Date time, String location, String task) {
+    public void deleteTask(Long time, String location, String task) {
         schedule.remove(time);
 
     }
-    public void modifyTask(Date time, String location, String task) {
+    public void modifyTask(Long time, String location, String task) {
         schedule.get(time).setLocation(location);
         schedule.get(time).setTask(task);
     }
-    public void taskDone(Date time) {
+    public void taskDone(Long time) {
         if (schedule.get(time).getStatus() == false) {
             schedule.get(time).setStatus(true);
         }
@@ -55,15 +58,15 @@ public class Schedule implements Parcelable {
             schedule.get(time).setStatus(false);
         }
     }
-    public SchedulePair findTask(Date time) {
+    public SchedulePair findTask(Long time) {
         return schedule.get(time);
     }
     public int getCount() {
         return schedule.size();
     }
-    public Date getNKey(int i) {
+    public Long getNKey(int i) {
         int count = 0;
-        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
             if (count == i) {
                 return entry.getKey();
             }
@@ -80,7 +83,7 @@ public class Schedule implements Parcelable {
 
     public String getNLocation(int i) {
         int count = 0;
-        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
             if (count == i) {
                 return entry.getValue().getLocation();
             }
@@ -91,7 +94,7 @@ public class Schedule implements Parcelable {
 
     public String getNTask(int i) {
         int count = 0;
-        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
             if (count == i) {
                 return entry.getValue().getTask();
             }
@@ -101,13 +104,16 @@ public class Schedule implements Parcelable {
     }
     //only removed if all tasks are finished
     public void removeAll() {
-        for (Map.Entry<Date,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
             if (entry.getValue().getStatus() == false) {
                 Log.d("done", "All tasks not finished yet");
                 return;
             }
         }
         schedule.clear();
+    }
+    public Map getMap() {
+        return this.schedule;
     }
 
 

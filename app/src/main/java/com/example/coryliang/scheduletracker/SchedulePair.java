@@ -3,14 +3,19 @@ package com.example.coryliang.scheduletracker;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * Created by Cory Liang on 6/3/2018.
  */
 
 public class SchedulePair implements Parcelable {
     //might change location to Location object
+    @Expose
     private String location;
+    @Expose
     private String task;
+    @Expose
     private boolean done;
     public SchedulePair(String one, String two, boolean three) {
         location = one;
