@@ -37,6 +37,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
     Calendar calendar = new GregorianCalendar();
     public String currLocation = "";
     private Stack<Marker> markers = new Stack<Marker>();
+    ListAdapter listAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +55,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         schedule.addTask(calendar.getTimeInMillis(), "California", "Fix IT");
         calendar.set(2018, 9, 24, 7, 0 , 0);
         schedule.addTask(calendar.getTimeInMillis(), "Missouri", "Cook food");
-        //Intent might not work for our purposes StartActivity
-        /*
-        Intent toPatient = new Intent(this, PatientActivity.class);
-        toPatient.setAction(Intent.ACTION_SEND);
-        toPatient.putExtra("schedule", (Schedule) schedule);
-        this.startActivity(toPatient);
-        */
+
         SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
         SharedPreferences.Editor prefEdit = pref.edit();
         //bugged information isnt passing to patient activity
@@ -71,7 +66,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         prefEdit.putString("schedule", json);
         prefEdit.commit();
         ListView list = (ListView) findViewById(R.id.taskList);
-        ListAdapter listAdapter = new ListAdapter(getApplicationContext(), schedule);
+        listAdapter = new ListAdapter(getApplicationContext(), schedule, 1);
         list.setAdapter(listAdapter);
         //start bluetooth connection
         BluetoothAdapter blue = BluetoothAdapter.getDefaultAdapter();
@@ -92,8 +87,14 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
             }
         });
         Log.d("Blue", "ran thread");
-    }
 
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        listAdapter.notifyDataSetChanged();
+        Log.d("Update", "Updating List");
+    }
     public void checkList() {
         String currTask;
         String currAddress;

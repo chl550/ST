@@ -21,6 +21,7 @@ import java.util.Map;
 public class PatientActivity extends AppCompatActivity {
     Schedule schedule = null;
     Map<Long, SchedulePair> hold = null;
+    ListAdapter listAdapter1 = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,14 +37,7 @@ public class PatientActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        //Bundle getData = getIntent().getExtras();
-        //don't know if we need to, keep going until we receive actual info.
-        /*
-        while(getIntent().getExtras() == null) {
-            getData = getIntent().getExtras();
-        }*/
 
-       // schedule = (Schedule) getData.getParcelable("schedule");
 
         SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
         GsonBuilder g = new GsonBuilder();
@@ -56,8 +50,15 @@ public class PatientActivity extends AppCompatActivity {
 
 
         ListView patList = (ListView) findViewById(R.id.taskList2);
-        ListAdapter listAdapter1 = new ListAdapter(getApplicationContext(), schedule);
+        listAdapter1 = new ListAdapter(getApplicationContext(), schedule,0);
         patList.setAdapter(listAdapter1);
+    }
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        listAdapter1.notifyDataSetChanged();
+        Log.d("list", "Updating PatientActivity");
     }
 
 
