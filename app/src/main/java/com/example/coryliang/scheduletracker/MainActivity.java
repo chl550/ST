@@ -39,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
                 final String pass = password.getText().toString();
                 System.out.println("THIS IS " + user);
                 System.out.println("THIS IS " + pass);
-                if (user.equals("caregiver") && pass.equals("pass")) {
+                if (user.equals("care") && pass.equals("1")) {
                     Toast.makeText(getApplicationContext(), "Successful Login",
                             Toast.LENGTH_LONG).show();
                     caregiverLaunch();
                     //move to caregiver screen here
                 }
-                else if (user.equals("patient") && pass.equals("pass")) {
+                else if (user.equals("pat") && pass.equals("1")) {
                     Toast.makeText(getApplicationContext(), "Successful patient login",
                             Toast.LENGTH_LONG).show();
                     //move to patient screen here

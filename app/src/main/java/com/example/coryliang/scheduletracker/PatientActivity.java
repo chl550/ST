@@ -55,7 +55,14 @@ public class PatientActivity extends AppCompatActivity {
     }
     @Override
     public void onResume() {
-
+        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        GsonBuilder g = new GsonBuilder();
+        Gson gson = g.create();
+        String json = pref.getString("schedule","");
+        Log.d("json", json);
+        Type type = new TypeToken<Map<Long,SchedulePair>>() {}.getType();
+        hold = (Map<Long, SchedulePair>) gson.fromJson(json, type);
+        schedule = new Schedule(hold);
         super.onResume();
         listAdapter1.notifyDataSetChanged();
         Log.d("list", "Updating PatientActivity");

@@ -51,6 +51,10 @@
         <activity
             android:name=".AlertActivity"
             android:label="@string/title_activity_alert"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".LoadSchedule"
+            android:label="@string/title_activity_load_schedule"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

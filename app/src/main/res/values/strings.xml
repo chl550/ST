@@ -3,4 +3,5 @@
     <string name="title_activity_caregiver">Caregiver</string>
     <string name="title_activity_patient">PatientActivity</string>
     <string name="title_activity_alert">AlertActivity</string>
+    <string name="title_activity_load_schedule">LoadSchedule</string>
 </resources>

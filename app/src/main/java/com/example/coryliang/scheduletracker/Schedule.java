@@ -58,6 +58,10 @@ public class Schedule implements Parcelable {
             schedule.get(time).setStatus(false);
         }
     }
+    public boolean checkTask(Long time) {
+        Log.d("list", "Status was " + schedule.get(time).getStatus());
+        return schedule.get(time).getStatus();
+    }
     public SchedulePair findTask(Long time) {
         return schedule.get(time);
     }
