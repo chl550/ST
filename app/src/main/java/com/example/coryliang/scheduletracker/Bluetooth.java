@@ -67,6 +67,10 @@ public class Bluetooth extends Thread implements Runnable{
         Log.d("Blue", "Connected");
         return true;
     }
+    //send a message to arduino
+    public void send(String message) throws IOException {
+        output.write(message.getBytes());
+    }
     @Override
     public void run() {
         String combine = "";
@@ -90,26 +94,32 @@ public class Bluetooth extends Thread implements Runnable{
                         combine += string;
                         //combine the strings
                         if (combine.contains("#")) {
-                            combine = combine.replaceAll("#","");
+                            String foo[];
+                            foo = combine.split("\n");
+                            combine = foo[0].replaceAll("#","");
                             Log.d("READ", "Combine has " + combine + " " +combine.length());
+                            if (combine.length() > 15) {
                             String[] array = combine.split(" ");
                             combine="";
-                            latitude = Float.valueOf(array[0]);
-                            longitude = Float.valueOf(array[1]);
-                            final float finalLatitude = latitude;
-                            final float finalLongitude = longitude;
-                            Runnable run = new Runnable() {
-                                @Override
-                                public void run() {
-                                    activity.updateLocation(finalLatitude, finalLongitude);
-                                    try {
-                                        activity.findLocation(finalLatitude, finalLongitude);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                latitude = Float.valueOf(array[0]);
+                                longitude = Float.valueOf(array[1]);
+                                final float finalLatitude = latitude;
+                                final float finalLongitude = longitude;
+                                Runnable run = new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        activity.updateLocation(finalLatitude, finalLongitude);
+                                        try {
+                                            activity.findLocation(finalLatitude, finalLongitude);
+                                            activity.checkList();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
                                     }
-                                }
-                            };
-                            care.post(run);
+                                };
+                                care.post(run);
+                            }
 
                         }
 

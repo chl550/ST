@@ -43,7 +43,8 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
     private Stack<Marker> markers = new Stack<Marker>();
     ListAdapter listAdapter = null;
     Map<Long, SchedulePair> hold = null;
-    boolean check = false;
+    public static boolean check = false;
+    Bluetooth thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,9 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        if (schedule != null) {
+        Log.d("check", String.valueOf(check));
+        if (check == true) {
+            Log.d("check", String.valueOf(check));
             SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
             GsonBuilder g = new GsonBuilder();
             Gson gson = g.create();
@@ -80,7 +83,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
             Intent enable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enable,0);
         }
-        final Bluetooth thread = new Bluetooth(blue, this);
+        thread = new Bluetooth(blue, this);
         Log.d("Blue", "running thread");
         runOnUiThread(new Runnable() {
             @Override
@@ -94,15 +97,13 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onClick(View view) {
                 launchLoad();
-                getSchedule();
-                check = true;
             }
         });
 
     }
     public void launchLoad() {
         Intent intent = new Intent(this,LoadSchedule.class);
-        startActivity(intent);
+        startActivityForResult(intent,200);
     }
     @Override
     public void onResume() {
@@ -120,23 +121,40 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
 
             listAdapter.notifyDataSetChanged();
             Log.d("Update", "Updating List");
+            try {
+                checkList();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
-    public void checkList() {
-        String currTask;
-        String currAddress;
-        Long time;
-        Long currTime = calendar.getTimeInMillis();
-        //keep checking until schedule is empty
-        while(!schedule.schedule.isEmpty()) {
-            Log.d("Alert", "ALERT TRIGGERED");
-            currTask = schedule.getNTask(0);
-            currAddress = schedule.getNLocation(0);
-            time = schedule.getNKey(0);
-            if (!currLocation.equals(currAddress) && time == currTime || (time != currTime && schedule.schedule.get(time).getStatus() == false)) {
-                //Move into Alert, send signal to arduino to buzz,
-                Intent intent = new Intent(this, AlertActivity.class);
-                startActivity(intent);
+    public void checkList() throws IOException {
+        if (schedule != null) {
+            Log.d("ALERT", "checking list");
+            String currAddress;
+            Long time;
+            Long currTime = calendar.getTimeInMillis();
+            //keep checking until schedule is empty
+            if (schedule.checkAllTrue() == false) {
+                //currLocation should hold gps location
+                time = schedule.getNextFalse();
+                if (schedule.schedule.get(time).getStatus() == false) {
+                    //get the current location from the schedule
+                    currAddress = schedule.schedule.get(time).getLocation();
+                    //if location isn't the same
+                    if (!currLocation.equals(currAddress) && time == currTime || (time != currTime && schedule.schedule.get(time).getStatus() == false)) {
+                        //Move into Alert, send signal to arduino to buzz, should be popup
+                        Log.d("Alert", "ALERT TRIGGERED");
+                        String signal = "%";
+                        //thread.send(signal);
+                        /*
+                        Intent intent = new Intent(this, AlertActivity.class);
+                        startActivity(intent);
+                        */
+                    }
+                }
+
             }
         }
     }
@@ -185,6 +203,20 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         ListView list = (ListView) findViewById(R.id.taskList);
         listAdapter = new ListAdapter(getApplicationContext(), schedule, 1);
         list.setAdapter(listAdapter);
+        check = true;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        getSchedule();
+    }
+    /*
+    @Override
+    public void onDestroy() {
+
+        super.onDestroy();
+        thread.interrupt();
+    }
+    */
 }

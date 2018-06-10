@@ -68,6 +68,16 @@ public class Schedule implements Parcelable {
     public int getCount() {
         return schedule.size();
     }
+    public Long getNextFalse() {
+        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+            if (entry.getValue().getStatus() == false) {
+                return entry.getKey();
+            }
+
+        }
+        long ret = 0;
+        return ret;
+    }
     public Long getNKey(int i) {
         int count = 0;
         for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
@@ -119,7 +129,15 @@ public class Schedule implements Parcelable {
     public Map getMap() {
         return this.schedule;
     }
-
+    public boolean checkAllTrue() {
+        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+            if (entry.getValue().getStatus() == false) {
+                Log.d("done", "All tasks not finished yet");
+                return false;
+            }
+        }
+        return true;
+    }
 
     protected Schedule(Parcel in) {
         pair = (SchedulePair) in.readValue(SchedulePair.class.getClassLoader());
