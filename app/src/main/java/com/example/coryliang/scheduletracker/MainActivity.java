@@ -44,14 +44,12 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                     caregiverLaunch();
                     //move to caregiver screen here
-                }
-                else if (user.equals("pat") && pass.equals("1")) {
+                } else if (user.equals("pat") && pass.equals("1")) {
                     Toast.makeText(getApplicationContext(), "Successful patient login",
                             Toast.LENGTH_LONG).show();
                     //move to patient screen here
                     patientLaunch();
-                }
-                else {
+                } else {
                     Toast.makeText(getApplicationContext(), "Username and Password doesn't match",
                             Toast.LENGTH_LONG).show();
                     //keep in the same screen
@@ -61,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         //TODO: Find way to get signals from Arduino, then move into method to get location.
 
 
-
     }
+
     private void caregiverLaunch() {
         Intent intent = new Intent(this, CaregiverActivity.class);
         startActivity(intent);
@@ -72,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent1 = new Intent(this, PatientActivity.class);
         this.startActivity(intent1);
     }
-
-
 
 
 }

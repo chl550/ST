@@ -22,6 +22,7 @@ public class PatientActivity extends AppCompatActivity {
     Schedule schedule = null;
     Map<Long, SchedulePair> hold = null;
     ListAdapter listAdapter1 = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,35 +40,37 @@ public class PatientActivity extends AppCompatActivity {
         });
 
 
-        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         GsonBuilder g = new GsonBuilder();
         Gson gson = g.create();
-        String json = pref.getString("schedule","");
+        String json = pref.getString("schedule", "");
         Log.d("json", json);
-        Type type = new TypeToken<Map<Long,SchedulePair>>() {}.getType();
+        Type type = new TypeToken<Map<Long, SchedulePair>>() {
+        }.getType();
         hold = (Map<Long, SchedulePair>) gson.fromJson(json, type);
         schedule = new Schedule(hold);
 
 
         ListView patList = (ListView) findViewById(R.id.taskList2);
-        listAdapter1 = new ListAdapter(getApplicationContext(), schedule,0);
+        listAdapter1 = new ListAdapter(getApplicationContext(), schedule, 0);
         patList.setAdapter(listAdapter1);
     }
+
     @Override
     public void onResume() {
-        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         GsonBuilder g = new GsonBuilder();
         Gson gson = g.create();
-        String json = pref.getString("schedule","");
+        String json = pref.getString("schedule", "");
         Log.d("json", json);
-        Type type = new TypeToken<Map<Long,SchedulePair>>() {}.getType();
+        Type type = new TypeToken<Map<Long, SchedulePair>>() {
+        }.getType();
         hold = (Map<Long, SchedulePair>) gson.fromJson(json, type);
         schedule = new Schedule(hold);
         super.onResume();
         listAdapter1.notifyDataSetChanged();
         Log.d("list", "Updating PatientActivity");
     }
-
 
 
 }

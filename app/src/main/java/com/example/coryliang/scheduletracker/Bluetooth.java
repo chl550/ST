@@ -22,12 +22,12 @@ import static java.security.AccessController.getContext;
  * Created by Cory Liang on 6/5/2018.
  */
 
-public class Bluetooth extends Thread implements Runnable{
+public class Bluetooth extends Thread implements Runnable {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     private final BluetoothAdapter blue;
     BluetoothSocket socket = null;
     InputStream input = null;
-    OutputStream output = null;
+    static OutputStream output = null;
     CaregiverActivity activity = null;
     Handler care = new Handler(Looper.myLooper());
 
@@ -39,13 +39,13 @@ public class Bluetooth extends Thread implements Runnable{
     public boolean connect(BluetoothAdapter blue) {
         Set bond = blue.getBondedDevices();
         if (bond.isEmpty()) {
-            Log.d("Blue","No Paired Devices");
+            Log.d("Blue", "No Paired Devices");
             return false;
 
         }
         BluetoothDevice hc = null;
         boolean found = false;
-        for (BluetoothDevice pair: blue.getBondedDevices()) {
+        for (BluetoothDevice pair : blue.getBondedDevices()) {
             if (pair.getAddress().equals("00:14:03:06:68:12")) {
                 hc = pair;
                 found = true;
@@ -67,10 +67,14 @@ public class Bluetooth extends Thread implements Runnable{
         Log.d("Blue", "Connected");
         return true;
     }
+
     //send a message to arduino
     public void send(String message) throws IOException {
+        Log.d("ALERT", "Sending " + message);
+
         output.write(message.getBytes());
     }
+
     @Override
     public void run() {
         String combine = "";
@@ -78,7 +82,7 @@ public class Bluetooth extends Thread implements Runnable{
         float longitude = 0;
         boolean check = true;
         if (connect(blue) == true) {
-            while(check) {
+            while (check) {
                 int byteCount = 0;
                 if (Thread.interrupted()) {
                     break;
@@ -96,11 +100,11 @@ public class Bluetooth extends Thread implements Runnable{
                         if (combine.contains("#")) {
                             String foo[];
                             foo = combine.split("\n");
-                            combine = foo[0].replaceAll("#","");
-                            Log.d("READ", "Combine has " + combine + " " +combine.length());
-                            if (combine.length() > 15) {
-                            String[] array = combine.split(" ");
-                            combine="";
+                            combine = foo[0].replaceAll("#", "");
+                            if (combine.length() > 15 && combine.contains("!") == false) {
+                                Log.d("READ", "Combine has " + combine + " " + combine.length());
+                                String[] array = combine.split(" ");
+                                combine = "";
                                 latitude = Float.valueOf(array[0]);
                                 longitude = Float.valueOf(array[1]);
                                 final float finalLatitude = latitude;
@@ -112,6 +116,8 @@ public class Bluetooth extends Thread implements Runnable{
                                         try {
                                             activity.findLocation(finalLatitude, finalLongitude);
                                             activity.checkList();
+
+
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }

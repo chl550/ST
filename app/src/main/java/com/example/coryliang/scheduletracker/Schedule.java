@@ -32,44 +32,52 @@ public class Schedule implements Parcelable {
     public SchedulePair pair;
 
     public Schedule() {
-        schedule = new TreeMap<Long,SchedulePair>();
+        schedule = new TreeMap<Long, SchedulePair>();
     }
+
     public Schedule(Map<Long, SchedulePair> schedule) {
         this.schedule = schedule;
     }
+
     public void addTask(Long time, String location, String task) {
-        pair = new SchedulePair(location,task, false);
+        pair = new SchedulePair(location, task, false);
         schedule.put(time, pair);
     }
+
     //might change later, will only be able to delete a task assuming person has unique times
     public void deleteTask(Long time, String location, String task) {
         schedule.remove(time);
 
     }
+
     public void modifyTask(Long time, String location, String task) {
         schedule.get(time).setLocation(location);
         schedule.get(time).setTask(task);
     }
+
     public void taskDone(Long time) {
         if (schedule.get(time).getStatus() == false) {
             schedule.get(time).setStatus(true);
-        }
-        else {
+        } else {
             schedule.get(time).setStatus(false);
         }
     }
+
     public boolean checkTask(Long time) {
         Log.d("list", "Status was " + schedule.get(time).getStatus());
         return schedule.get(time).getStatus();
     }
+
     public SchedulePair findTask(Long time) {
         return schedule.get(time);
     }
+
     public int getCount() {
         return schedule.size();
     }
+
     public Long getNextFalse() {
-        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long, SchedulePair> entry : schedule.entrySet()) {
             if (entry.getValue().getStatus() == false) {
                 return entry.getKey();
             }
@@ -78,9 +86,10 @@ public class Schedule implements Parcelable {
         long ret = 0;
         return ret;
     }
+
     public Long getNKey(int i) {
         int count = 0;
-        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long, SchedulePair> entry : schedule.entrySet()) {
             if (count == i) {
                 return entry.getKey();
             }
@@ -89,6 +98,7 @@ public class Schedule implements Parcelable {
         }
         return null;
     }
+
     public String dateToString(Date time) {
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         String ret = df.format(time);
@@ -97,7 +107,7 @@ public class Schedule implements Parcelable {
 
     public String getNLocation(int i) {
         int count = 0;
-        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long, SchedulePair> entry : schedule.entrySet()) {
             if (count == i) {
                 return entry.getValue().getLocation();
             }
@@ -108,7 +118,7 @@ public class Schedule implements Parcelable {
 
     public String getNTask(int i) {
         int count = 0;
-        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long, SchedulePair> entry : schedule.entrySet()) {
             if (count == i) {
                 return entry.getValue().getTask();
             }
@@ -116,9 +126,10 @@ public class Schedule implements Parcelable {
         }
         return null;
     }
+
     //only removed if all tasks are finished
     public void removeAll() {
-        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long, SchedulePair> entry : schedule.entrySet()) {
             if (entry.getValue().getStatus() == false) {
                 Log.d("done", "All tasks not finished yet");
                 return;
@@ -126,11 +137,13 @@ public class Schedule implements Parcelable {
         }
         schedule.clear();
     }
+
     public Map getMap() {
         return this.schedule;
     }
+
     public boolean checkAllTrue() {
-        for (Map.Entry<Long,SchedulePair> entry : schedule.entrySet()) {
+        for (Map.Entry<Long, SchedulePair> entry : schedule.entrySet()) {
             if (entry.getValue().getStatus() == false) {
                 Log.d("done", "All tasks not finished yet");
                 return false;

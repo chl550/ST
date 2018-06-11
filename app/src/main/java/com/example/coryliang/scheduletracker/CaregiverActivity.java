@@ -44,6 +44,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
     ListAdapter listAdapter = null;
     Map<Long, SchedulePair> hold = null;
     public static boolean check = false;
+    public static boolean isBluetooth = false;
     Bluetooth thread;
 
     @Override
@@ -72,16 +73,24 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
             list.setAdapter(listAdapter);
         }
 
+        startBluetooth();
 
+    }
+
+    public void launchLoad() {
+        Intent intent = new Intent(this, LoadSchedule.class);
+        startActivityForResult(intent, 200);
+    }
+
+    public void startBluetooth() {
         //start bluetooth connection
         BluetoothAdapter blue = BluetoothAdapter.getDefaultAdapter();
         if (blue == null) {
-            Log.d("Blue","No bluetooth");
+            Log.d("Blue", "No bluetooth");
 
-        }
-        else if (!blue.isEnabled()) {
+        } else if (!blue.isEnabled()) {
             Intent enable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enable,0);
+            startActivityForResult(enable, 0);
         }
         thread = new Bluetooth(blue, this);
         Log.d("Blue", "running thread");
@@ -99,12 +108,9 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
                 launchLoad();
             }
         });
+        isBluetooth = true;
+    }
 
-    }
-    public void launchLoad() {
-        Intent intent = new Intent(this,LoadSchedule.class);
-        startActivityForResult(intent,200);
-    }
     @Override
     public void onResume() {
         super.onResume();
@@ -129,6 +135,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
         }
 
     }
+
     public void checkList() throws IOException {
         if (schedule != null) {
             Log.d("ALERT", "checking list");
@@ -146,8 +153,8 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
                     if (!currLocation.equals(currAddress) && time == currTime || (time != currTime && schedule.schedule.get(time).getStatus() == false)) {
                         //Move into Alert, send signal to arduino to buzz, should be popup
                         Log.d("Alert", "ALERT TRIGGERED");
-                        String signal = "%";
-                        //thread.send(signal);
+                        String signal = "error";
+                        thread.send(signal);
                         /*
                         Intent intent = new Intent(this, AlertActivity.class);
                         startActivity(intent);
@@ -169,6 +176,7 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+
     //update map, move map marker.
     public void updateLocation(float latitude, float longitude) {
   /*     Marker top = null;

@@ -43,6 +43,7 @@ public class ListAdapter extends BaseAdapter {
         this.version = version;
 
     }
+
     public ListAdapter(Context context, Schedule schedule, int version, CaregiverActivity activity) {
         this.context = context;
         this.schedule = schedule;
@@ -69,17 +70,17 @@ public class ListAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
-        final SharedPreferences pref = context.getSharedPreferences("data",MODE_PRIVATE);
+        final SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
         final GsonBuilder g = new GsonBuilder();
         final Gson gson = g.create();
-        json = pref.getString("schedule","");
-        Type type = new TypeToken<Map<Long,SchedulePair>>() {}.getType();
+        json = pref.getString("schedule", "");
+        Type type = new TypeToken<Map<Long, SchedulePair>>() {
+        }.getType();
         hold = (Map<Long, SchedulePair>) gson.fromJson(json, type);
         schedule = new Schedule(hold);
         if (version == 0) {
             view = layout.inflate(R.layout.activity_list, null);
-        }
-        else {
+        } else {
             view = layout.inflate(R.layout.activity_list2, null);
         }
         final View tempView = view;
