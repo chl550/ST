@@ -80,7 +80,7 @@ public class ListAdapter extends BaseAdapter {
         schedule = new Schedule(hold);
         if (version == 0) {
             view = layout.inflate(R.layout.activity_list, null);
-        } else {
+        } else if (version == 1){
             view = layout.inflate(R.layout.activity_list2, null);
         }
         final View tempView = view;

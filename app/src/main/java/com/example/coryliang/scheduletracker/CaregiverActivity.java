@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -154,7 +155,9 @@ public class CaregiverActivity extends FragmentActivity implements OnMapReadyCal
                         //Move into Alert, send signal to arduino to buzz, should be popup
                         Log.d("Alert", "ALERT TRIGGERED");
                         String signal = "error";
-                        thread.send(signal);
+                        Toast.makeText(getApplicationContext(), "ALERT TRIGGERED",
+                                Toast.LENGTH_LONG).show();
+                        //thread.send(signal);
                         /*
                         Intent intent = new Intent(this, AlertActivity.class);
                         startActivity(intent);
